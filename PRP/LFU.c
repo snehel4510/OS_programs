@@ -18,7 +18,8 @@ int main()
     char *str = (char *)malloc(sizeof(char) * 100);
     scanf("%s", str);
     printf("Enter the frame no : ");
-    int f, i = 0, m = 0, h = 0;
+    int f, i, m, h;
+    i = m = h = 0;
     scanf("%d", &f);
     char a[f];
     for (int i = 0; i < f; i++)
