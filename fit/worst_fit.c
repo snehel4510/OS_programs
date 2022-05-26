@@ -37,8 +37,6 @@ int main()
     }
     printf("processes allocated to partitions :- \n");
     for (int i = 0; i < n2; i++)
-    {
         printf("%d\t%d\n", pro[i][0], pro[i][1]);
-    }
     return 0;
 }
