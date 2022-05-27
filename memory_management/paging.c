@@ -1,3 +1,4 @@
+// general paging technique using counting the no of bits in binary representation of virtual address
 #include <stdio.h>
 #include <math.h>
 int main()

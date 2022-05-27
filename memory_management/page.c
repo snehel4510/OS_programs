@@ -1,3 +1,4 @@
+// paging concept in OS using formula -> page no = virtual address / page size and offset = virtual address % page size
 #include <stdio.h>
 int main()
 {

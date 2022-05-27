@@ -1,3 +1,4 @@
+// simulation of segmentation process in C using pre-defined andn user-defined segments
 #include <stdio.h>
 #include <math.h>
 int main()
