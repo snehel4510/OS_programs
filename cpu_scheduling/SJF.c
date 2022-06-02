@@ -1,91 +1,94 @@
-// Program to implement shortest job first non-preamptive CPU scheduling algorithm with arrival time
 #include <stdio.h>
-void swap(int a[], int i, int j)
+#include <stdlib.h>
+
+struct process
 {
-    int temp = a[i];
-    a[i] = a[j];
-    a[j] = temp;
-}
-int max(int a, int b)
-{
-    if (a >= b)
-        return a;
-    return b;
-}
+    int at, bt, ct, wt, tat, p;
+} process[10];
+
+struct process temp;
 int main()
 {
-    int i, j, n, p[30], at[30], bt[30], tat[30], wt[30], q[30], v[30];
-    float awt = 0, att = 0;
-    printf("Enter the number of processes : ");
-    scanf("%d", &n);
-    printf("Enter the arrival time and burst time of processes :-\n");
-    for (i = 0; i < n; i++)
+    int number, i, j, min;
+    float atat = 0, awt = 0;
+    printf("enter the number process : ");
+    scanf("%d", &number);
+    printf("enter arrival and burst time :-\n");
+    for (i = 0; i < number; i++)
     {
-        p[i] = i;
-        v[i] = 0;
-        printf("Process %d : ", i);
-        scanf("%d %d", &at[i], &bt[i]);
+        printf("p[%d]:", i + 1);
+        scanf("%d %d", &process[i].at, &process[i].bt);
+        process[i].p = i + 1;
     }
-    // sort the processes on the basis of arrival time, if arrival time is same, then sort on the basis of burst time
-    for (i = 0; i < n - 1; i++)
+    // sort the processes by arrival time
+    for (i = 0; i < number - 1; i++)
     {
-        for (j = i + 1; j < n; j++)
+        for (j = i; j < number; j++)
         {
-            if (at[i] > at[j])
+            if (process[i].at > process[j].at)
             {
-                swap(at, i, j);
-                swap(bt, i, j);
-                swap(p, i, j);
+                temp = process[i];
+                process[i] = process[j];
+                process[j] = temp;
             }
-            else if (at[i] == at[j])
+            if (process[i].at == process[j].at) // if same arrival time then sort by burst time
             {
-                if (bt[i] > bt[j])
+                if (process[i].bt > process[j].bt)
                 {
-                    swap(at, i, j);
-                    swap(bt, i, j);
-                    swap(p, i, j);
+                    temp = process[i];
+                    process[i] = process[j];
+                    process[j] = temp;
                 }
             }
         }
     }
-    i = 1;
-    q[0] = p[0];
-    v[0] = 1;
-    int end = at[q[0]] + bt[q[0]];
-    while (i < 4)
+    // first process will be the one with least arrival time
+    if (process[0].at > 0)
+        printf("cpu was idle for 0 to %d\n", process[0].at - 1);
+    process[0].ct = process[0].at + process[0].bt;
+    process[0].tat = process[0].bt;
+    printf("process in order : %d\n", process[0].p);
+    // to check how many process will be in the readyqueue till cuurrent process completion's time
+    int time = process[0].ct;
+    for (i = 1; i < number; i++)
     {
-        int k = i;
-        for (j = 0; j < n; j++)
+        // when CPU will be Idle
+        if (process[i].at > time)
         {
-            if (!v[j] && at[j] <= end)
+            process[i].ct = process[i].at + process[i].bt;
+            printf("cpu was idle for %d to %d\n", time, process[i].at - 1);
+            time = process[i].ct;
+            process[i].wt = 0;
+            process[i].tat = process[i].bt;
+            printf("process in order : %d\n", process[i].p);
+        }
+        else
+        {
+            // swapping current process with the one having least burst time and is in the readyqueue
+            min = process[i].bt;
+            for (j = i; j < number; j++)
             {
-                v[j] = 1;
-                q[i] = p[j];
-                end = max(end, at[q[i]] + bt[q[i]]);
-                i++;
+                if (process[j].at <= time && process[j].bt < min)
+                {
+                    min = process[j].bt;
+                    temp = process[i];
+                    process[i] = process[j];
+                    process[j] = temp;
+                }
             }
+            printf("process in order : %d\n", process[i].p);
+            process[i].ct = time + process[i].bt;
+            time = process[i].ct;
+            process[i].tat = process[i].ct - process[i].at;
+            process[i].wt = process[i].tat - process[i].bt;
         }
-        }
-    for (int i = 0; i < n; i++)
-    {
-        printf("%d\n", q[i]);
+        atat += process[i].tat;
+        awt += process[i].wt;
     }
-    // // calculate waiting time and turn around time
-    // printf("\nProcess\t\tArrival Time\tBurst Time\tWaiting Time\tTurn Around Time\n");
-    // for (i = 0; i < n; i++)
-    // {
-    //     if (i == 0)
-    //         wt[i] = 0;
-    //     else
-    //         wt[i] = wt[i - 1] + bt[i - 1];
-    //     tat[i] = wt[i] + bt[i];
-    //     awt = awt + wt[i];
-    //     att = att + tat[i];
-    //     printf("\nP[%d]\t\t%d\t\t%d\t\t%d\t\t%d", p[i], at[i], bt[i], wt[i], tat[i]);
-    // }
-    // awt = awt / n;
-    // att = att / n;
-    // printf("\nAverage Waiting Time : %f", awt);
-    // printf("\nAverage Turn Around Time : %f", att);
+    printf("process\t\tat\tbt\twt\ttat\tct\n");
+    for (i = 0; i < number; i++)
+        printf("%d\t\t%d\t%d\t%d\t%d\t%d\t\n", process[i].p, process[i].at, process[i].bt, process[i].wt, process[i].tat, process[i].ct);
+    printf("average waiting time : %f\n", awt / number);
+    printf("average turn around time : %f\n", atat / number);
     return 0;
 }
